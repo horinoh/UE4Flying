@@ -87,6 +87,16 @@ void AUE4FlyingPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("Thrust", this, &AUE4FlyingPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("MoveUp", this, &AUE4FlyingPawn::MoveUpInput);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AUE4FlyingPawn::MoveRightInput);
+
+#pragma region AddedCode
+	PlayerInputComponent->BindAxis("Roll", this, &AUE4FlyingPawn::RollInput);
+	PlayerInputComponent->BindAxis("Pitch", this, &AUE4FlyingPawn::PitchInput);
+	PlayerInputComponent->BindAxis("Yaw", this, &AUE4FlyingPawn::YawInput);
+	PlayerInputComponent->BindAxis("Throttle", this, &AUE4FlyingPawn::ThrottleInput);
+
+	PlayerInputComponent->BindAction("Gun", IE_Repeat, this, &AUE4FlyingPawn::GunInput);
+	PlayerInputComponent->BindAction("Missile", IE_Pressed, this, &AUE4FlyingPawn::MissileInput);
+#pragma endregion
 }
 
 void AUE4FlyingPawn::ThrustInput(float Val)
@@ -131,3 +141,39 @@ void AUE4FlyingPawn::MoveRightInput(float Val)
 	// Smoothly interpolate roll speed
 	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 }
+
+#pragma region AddedCode
+void AUE4FlyingPawn::RollInput(float Val)
+{
+	float TargetSpeed = (Val * TurnSpeed);
+	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+}
+void AUE4FlyingPawn::PitchInput(float Val)
+{
+	MoveUpInput(Val);
+}
+void AUE4FlyingPawn::YawInput(float Val)
+{
+	float TargetSpeed = (Val * TurnSpeed);
+	CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+}
+void AUE4FlyingPawn::ThrottleInput(float Val)
+{
+	ThrustInput(Val);
+}
+
+void AUE4FlyingPawn::GunInput()
+{
+	if (GEngine) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White, TEXT("GUN"));
+	}
+}
+void AUE4FlyingPawn::MissileInput()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("MISSILE"));
+	}
+}
+#pragma endregion

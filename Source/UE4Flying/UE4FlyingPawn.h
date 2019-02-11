@@ -44,6 +44,16 @@ protected:
 	/** Bound to the horizontal axis */
 	void MoveRightInput(float Val);
 
+#pragma region AddedCode
+	void RollInput(float Val);
+	void PitchInput(float Val);
+	void YawInput(float Val);
+	void ThrottleInput(float Val);
+
+	void GunInput();
+	void MissileInput();
+#pragma endregion
+
 private:
 
 	/** How quickly forward speed changes */
@@ -55,11 +65,11 @@ private:
 	float TurnSpeed;
 
 	/** Max forward speed */
-	UPROPERTY(Category = Pitch, EditAnywhere)
+	UPROPERTY(Category = PitchInput, EditAnywhere)
 	float MaxSpeed;
 
 	/** Min forward speed */
-	UPROPERTY(Category=Yaw, EditAnywhere)
+	UPROPERTY(Category=YawInput, EditAnywhere)
 	float MinSpeed;
 
 	/** Current forward speed */
