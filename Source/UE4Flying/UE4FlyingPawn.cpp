@@ -84,9 +84,11 @@ void AUE4FlyingPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	check(PlayerInputComponent);
 
 	// Bind our control axis' to callback functions
-	PlayerInputComponent->BindAxis("Thrust", this, &AUE4FlyingPawn::ThrustInput);
-	PlayerInputComponent->BindAxis("MoveUp", this, &AUE4FlyingPawn::MoveUpInput);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AUE4FlyingPawn::MoveRightInput);
+#pragma region ChangeCode
+	//PlayerInputComponent->BindAxis("Thrust", this, &AUE4FlyingPawn::ThrustInput);
+	//PlayerInputComponent->BindAxis("MoveUp", this, &AUE4FlyingPawn::MoveUpInput);
+	//PlayerInputComponent->BindAxis("MoveRight", this, &AUE4FlyingPawn::MoveRightInput);
+#pragma endregion
 
 #pragma region AddedCode
 	PlayerInputComponent->BindAxis("Roll", this, &AUE4FlyingPawn::RollInput);
@@ -150,7 +152,8 @@ void AUE4FlyingPawn::RollInput(float Val)
 }
 void AUE4FlyingPawn::PitchInput(float Val)
 {
-	MoveUpInput(Val);
+	float TargetSpeed = (Val * TurnSpeed * -1.f);
+	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 }
 void AUE4FlyingPawn::YawInput(float Val)
 {
@@ -159,7 +162,10 @@ void AUE4FlyingPawn::YawInput(float Val)
 }
 void AUE4FlyingPawn::ThrottleInput(float Val)
 {
-	ThrustInput(Val);
+	bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
+	float CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
+	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 }
 
 void AUE4FlyingPawn::GunInput()
